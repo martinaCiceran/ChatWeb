@@ -15,6 +15,8 @@ const exphbs  = require('express-handlebars'); //Para el manejo de los HTML
 const bodyParser = require('body-parser'); //Para el manejo de los strings JSON
 const MySQL = require('./modulos/mysql'); //Añado el archivo mysql.js presente en la carpeta módulos
 
+const session = require('express-session'); //Para usar variables de sesión
+
 const app = express(); //Inicializo express para el manejo de las peticiones
 
 app.use(express.static('public')); //Expongo al lado cliente la carpeta "public"
@@ -32,6 +34,8 @@ const server=app.listen(Listen_Port, function() {
 });
 
 const io= require('socket.io')(server);
+
+app.use(session({secret: '123456', resave: true, saveUninitialized: true}));
 /*
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
