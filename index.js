@@ -35,6 +35,18 @@ const server=app.listen(Listen_Port, function() {
 
 const io= require('socket.io')(server);
 
+/*const sessionMiddleware=session({
+    secret: 'sararasthastka',
+    resave: true,
+    saveUnintialized: false,
+});
+
+app.use(sessionMiddleware);
+
+io.use(function(socket, next) {
+    sessionMiddleware(socket.request, socket.request.res, next);
+});*/
+
 app.use(session({secret: '123456', resave: true, saveUninitialized: true}));
 /*
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
