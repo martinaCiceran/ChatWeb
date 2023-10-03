@@ -65,7 +65,7 @@ app.get('/', function(req, res)
 {
     //Petición GET con URL = "/", lease, página principal.
     console.log(req.query); //En req.query vamos a obtener el objeto con los parámetros enviados desde el frontend por método GET
-    res.render('home', null); //Renderizo página "login" sin pasar ningún objeto a Handlebars
+    res.render('login', null); //Renderizo página "login" sin pasar ningún objeto a Handlebars
 });
 
 app.get('/login', function(req, res)
@@ -87,29 +87,44 @@ app.post('/login', function(req, res)
     res.render('home', null); //Renderizo página "home" sin pasar ningún objeto a Handlebars
 });
 
-app.put('/login', async function(req, res) {
-    //Petición PUT con URL = "/login"
-    console.log("Soy un pedido PUT", req.body); //En req.body vamos a obtener el objeto con los parámetros enviados desde el frontend por método PUT
-    //Consulto en la bdd de la existencia del usuario
-    let respuesta = await MySQL.realizarQuery(`SELECT * FROM Users WHERE User = "${req.body.user}" AND Password = "${req.body.pass}"`)
-    req.session.user = req.body.user
+app.post('/login', async function(req, res)
+{
+    console.log("Soy un pedido POST/login", req.body); 
+    let vectorUsuario =  await MySQL.realizarQuery("SELECT * FROM Usuarios")
+    let respuesta = await MySQL.realizarQuery(`SELECT * FROM Usuarios WHERE usuario = "${req.body.usuario}" AND contraseña = "${req.body.contraseña}"`)
     //Chequeo el largo del vector a ver si tiene datos
+    req.session.usuario = req.body.usuario
     if (respuesta.length > 0) {
         //Armo un objeto para responder
-        res.send({validar: true})    
+        res.send({validar: true, admin: admin})    
     }
     else{
         res.send({validar:false})    
     }
-    
-    
 });
+
+app.get('/registro', function(req, res)
+{
+    //Petición GET con URL = "/login"
+    console.log("Soy un pedido GET/registro", req.query); 
+    //En req.query vamos a obtener el objeto con los parámetros enviados desde el frontend por método GET
+    res.render('registro', null); //Renderizo página "home" sin pasar ningún objeto a Handlebars
+});
+
+app.post('/enviarRegistro', async function(req, res){
+    console.log("Soy un pedido POST/enviarRegistro", req.body);
+    await MySQL.realizarQuery(`INSERT INTO Usuarios(dni, nombre, usuario, contraseña) VALUES("${req.body.dni}", "${req.body.nombre}", "${req.body.usuario}", "${req.body.contraseña}") `)
+    console.log(await (MySQL.realizarQuery("SELECT * FROM Usuarios")))
+    res.render('home',null);
+});
+
 
 app.delete('/login', function(req, res) {
     //Petición DELETE con URL = "/login"
     console.log("Soy un pedido DELETE", req.body); //En req.body vamos a obtener el objeto con los parámetros enviados desde el frontend por método DELETE
     res.send(null);
 });
+
 
 
 

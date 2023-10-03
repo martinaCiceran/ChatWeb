@@ -1,18 +1,25 @@
-<form action="/login" method="POST" id="form1" class="container-sm">
+<form action="/login" method="POST" class="container-sm" id="logReg">
     <div class="mb-3 form-group">
-        <h2>Login de prueba</h2>
+        <h2 id="tituloIngresar">INGRESAR</h2>
+    </div><br>
+    <div class="mb-3 form-group">
+        <label for="usuarioId" class="form-label">USUARIO</label>
+        <input type="text" class="form-control" id="usuarioId" name="usuario" value="" placeholder="Ingrese un nombre de usuario" >
     </div>
     <div class="mb-3 form-group">
-        <label for="usuarioId" class="form-label">Usuario</label>
-        <input type="text" class="form-control" id="usuarioId" name="usuario" value="" placeholder="Ingrese un nombre de usuario">
-    </div>
-    <div class="mb-3 form-group">
-        <label for="passwordId" class="form-label">Password</label>
-        <input type="password" class="form-control" id="passwordId" placeholder="Contraseña">
+        <label for="contraseñaId" class="form-label">CONTRASEÑA</label>
+        <input type="password" class="form-control" id="contraseñaId" placeholder="Contraseña" >
     </div>
     <div class="mb-3 form-check">
-        <input type="button" onclick="login()" class="btn btn-primary" value="Ingresar">
+        <input type="button" onclick="login()" class="botonesEnGeneral" value="INGRESAR" >
     </div>
 </form>
+<form action="/registro" method="GET" class="container-sm" id="Regi">
+    <div class="mb-3 form-check">
+        <input type="submit" class="botonesEnGeneral" value="REGISTRARSE" >
+    </div>
+        <!--quiero regitarse -->
+</form>
 
-
+<form action="/home" method="POST" class="container-sm" id="formlogin">
+</form>
