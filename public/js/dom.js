@@ -42,3 +42,8 @@ async function putJSON(data) {
     //data es el objeto que le paso al back
     putJSON(data)
   }
+
+
+  function enviarMensaje() {
+    enviarMensajeGeneral(document.getElementById("message-input").value)
+  }

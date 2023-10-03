@@ -32,10 +32,12 @@
                     <p>¡Hola! Estoy bien, gracias.</p>
                 </div>
             </div>
-            <div class="input-container">
-                <input type="text" id="message-input" placeholder="Escribe un mensaje...">
-                <button id="send-button">Enviar</button>
-            </div>
+            <form action="/enviar" method="POST">
+                <div class="input-container">
+                    <input type="text" id="message-input" placeholder="Escribe un mensaje...">
+                    <input type="button" onclick="enviarMensaje()" class="btn btn-primary" d="send-button" value="Enviar">
+                </div>
+            </form>
         </div>
     </section>
 </body>

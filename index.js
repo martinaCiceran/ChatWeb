@@ -48,6 +48,7 @@ io.use(function(socket, next) {
 });*/
 
 app.use(session({secret: '123456', resave: true, saveUninitialized: true}));
+
 /*
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
@@ -91,6 +92,7 @@ app.put('/login', async function(req, res) {
     console.log("Soy un pedido PUT", req.body); //En req.body vamos a obtener el objeto con los parámetros enviados desde el frontend por método PUT
     //Consulto en la bdd de la existencia del usuario
     let respuesta = await MySQL.realizarQuery(`SELECT * FROM Users WHERE User = "${req.body.user}" AND Password = "${req.body.pass}"`)
+    req.session.user = req.body.user
     //Chequeo el largo del vector a ver si tiene datos
     if (respuesta.length > 0) {
         //Armo un objeto para responder
@@ -118,7 +120,7 @@ io.on("connection", (socket) => {
     //Esto serìa el equivalente a un app.post, app.get...
     socket.on('incoming-message', data => {
         console.log("INCOMING MESSAGE:", data);
-        io.edmit("server-message", {mensaje:"MENSAJE DE SERVIDOR"})
+        io.emit("server-message", {mensaje:"MENSAJE DE SERVIDOR"/*, user:req.session.user*/})
     });
 });
 
