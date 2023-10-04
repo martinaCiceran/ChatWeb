@@ -68,17 +68,8 @@ app.get('/', function(req, res)
     res.render('login', null); //Renderizo página "login" sin pasar ningún objeto a Handlebars
 });
 
-app.get('/login', function(req, res)
-{
-    //Petición GET con URL = "/login"
-    console.log("Soy un pedido GET", req.query); 
-    let usuarios = MySQL.realizarQuery("SELECT * FROM Users")
-    //En req.query vamos a obtener el objeto con los parámetros enviados desde el frontend por método GET
-    
-    res.render('home', {vector: usuarios}); //Renderizo página "home" sin pasar ningún objeto a Handlebars
-});
 
-app.post('/login', function(req, res)
+app.get('/irAlogin', function(req, res)
 {
     //Petición POST con URL = "/login"
     console.log("Soy un pedido POST", req.body); 
@@ -87,20 +78,35 @@ app.post('/login', function(req, res)
     res.render('home', null); //Renderizo página "home" sin pasar ningún objeto a Handlebars
 });
 
+
+
 app.post('/login', async function(req, res)
 {
     console.log("Soy un pedido POST/login", req.body); 
-    let vectorUsuario =  await MySQL.realizarQuery("SELECT * FROM Usuarios")
-    let respuesta = await MySQL.realizarQuery(`SELECT * FROM Usuarios WHERE usuario = "${req.body.usuario}" AND contraseña = "${req.body.contraseña}"`)
+    let vectorUsuario =  await MySQL.realizarQuery("SELECT * FROM Contactos")
+    console.log(vectorUsuario)
+    let respuesta = await MySQL.realizarQuery(`SELECT * FROM Contactos WHERE usuario = "${req.body.usuario}" AND contraseña = "${req.body.contraseña}"`)
+    let idUsuario = await MySQL.realizarQuery(`SELECT idContacto FROM Contactos WHERE usuario = "${req.body.usuario}" AND contraseña = "${req.body.contraseña}"`)
     //Chequeo el largo del vector a ver si tiene datos
-    req.session.usuario = req.body.usuario
+    req.session.usuario = idUsuario
     if (respuesta.length > 0) {
         //Armo un objeto para responder
-        res.send({validar: true, admin: admin})    
+        res.send({validar: true})    
     }
     else{
         res.send({validar:false})    
     }
+});
+
+
+app.post('/home', async function(req, res)
+{
+    //Petición POST con URL = "/login"
+    console.log("Soy un pedido POST", req.body); 
+    let mensajes = await MySQL.realizarQuery(`SELECT mensaje FROM Mensajes WHERE idContacto = 1`)
+    //En req.body vamos a obtener el objeto co"n los parámetros enviados desde el frontend por método POST
+    //res.render('home', { mensaje: "Hola mundo!", usuario: req.body.usuario}); //Renderizo página "home" enviando un objeto de 2 parámetros a Handlebars
+    res.render('home', null); //Renderizo página "home" sin pasar ningún objeto a Handlebars
 });
 
 app.get('/registro', function(req, res)
@@ -113,18 +119,17 @@ app.get('/registro', function(req, res)
 
 app.post('/enviarRegistro', async function(req, res){
     console.log("Soy un pedido POST/enviarRegistro", req.body);
-    await MySQL.realizarQuery(`INSERT INTO Usuarios(dni, nombre, usuario, contraseña) VALUES("${req.body.dni}", "${req.body.nombre}", "${req.body.usuario}", "${req.body.contraseña}") `)
-    console.log(await (MySQL.realizarQuery("SELECT * FROM Usuarios")))
+    await MySQL.realizarQuery(`INSERT INTO Contactos(usuario, contraseña) VALUES("${req.body.usuario}", "${req.body.contraseña}") `)
+    console.log(await (MySQL.realizarQuery("SELECT * FROM Contactos")))
     res.render('home',null);
 });
 
 
-app.delete('/login', function(req, res) {
+/*app.delete('/login', function(req, res) {
     //Petición DELETE con URL = "/login"
     console.log("Soy un pedido DELETE", req.body); //En req.body vamos a obtener el objeto con los parámetros enviados desde el frontend por método DELETE
     res.send(null);
-});
-
+});*/
 
 
 
@@ -135,8 +140,8 @@ io.on("connection", (socket) => {
     //Esto serìa el equivalente a un app.post, app.get...
     socket.on('incoming-message', data => {
         console.log("INCOMING MESSAGE:", data);
-        io.emit("server-message", {mensaje:"MENSAJE DE SERVIDOR"/*, user:req.session.user*/})
+        io.emit("server-message", {mensaje:"MENSAJE DE SERVIDOR", user: req.session.usuario})
     });
 });
 
-setInterval(() => io.emit("server-message", { mensaje: "MENSAJE DEL SERVIDOR" }), 2000);
+setInterval(() => io.emit("server-message", { mensaje: "MENSAJE DEL SERVIDOR"}), 2000);

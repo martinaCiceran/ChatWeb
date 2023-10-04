@@ -31,11 +31,16 @@
                 <div class="message sent">
                     <p>¡Hola! Estoy bien, gracias.</p>
                 </div>
+                {{#each mensajes}}
+                    <div class="message sent">
+                        <p>{{this.mensaje}}</p>
+                    </div>
+                {{/each}}
             </div>
             <form action="/enviar" method="POST">
                 <div class="input-container">
                     <input type="text" id="message-input" placeholder="Escribe un mensaje...">
-                    <input type="button" onclick="enviarMensaje()" class="btn btn-primary" d="send-button" value="Enviar">
+                    <input type="button" onclick="enviarMensaje()" class="btn btn-primary" id="send-button" value="Enviar">
                 </div>
             </form>
         </div>

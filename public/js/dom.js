@@ -19,17 +19,11 @@ async function putJSON(data) {
     } else {
       //Envio el formularia desde dom para cambiar de pagina
       //Podria usar tambien un changeScreen()
-      if (result.admin == true){
-        location.href = "/admin" //llama a un pedido get llamado admin
-      } 
-      else{
-        document.getElementById("formlogin").submit()
-      }
-      
+      document.getElementById("formlogin").submit()
     }
   } catch (error) {
-  console.error("Error:", error);
-}
+    console.error("Error:", error);
+  }
 }
 
 //Esta funcion la llama el boton Ingresar que tiene que ser type button para ejecutar el onclick
@@ -52,3 +46,4 @@ function login() {
 function enviarMensaje() {
   enviarMensajeGeneral(document.getElementById("message-input").value)
 }
+
