@@ -84,11 +84,11 @@ app.post('/login', async function(req, res)
 {
     console.log("Soy un pedido POST/login", req.body); 
     let vectorUsuario =  await MySQL.realizarQuery("SELECT * FROM Contactos")
-    console.log(vectorUsuario)
     let respuesta = await MySQL.realizarQuery(`SELECT * FROM Contactos WHERE usuario = "${req.body.usuario}" AND contraseña = "${req.body.contraseña}"`)
     let idUsuario = await MySQL.realizarQuery(`SELECT idContacto FROM Contactos WHERE usuario = "${req.body.usuario}" AND contraseña = "${req.body.contraseña}"`)
     //Chequeo el largo del vector a ver si tiene datos
     req.session.usuario = idUsuario
+    console.log(req.session.usuario)
     if (respuesta.length > 0) {
         //Armo un objeto para responder
         res.send({validar: true})    
@@ -104,9 +104,8 @@ app.post('/home', async function(req, res)
     //Petición POST con URL = "/login"
     console.log("Soy un pedido POST", req.body); 
     let mensajes = await MySQL.realizarQuery(`SELECT mensaje FROM Mensajes WHERE idContacto = 1`)
-    //En req.body vamos a obtener el objeto co"n los parámetros enviados desde el frontend por método POST
-    //res.render('home', { mensaje: "Hola mundo!", usuario: req.body.usuario}); //Renderizo página "home" enviando un objeto de 2 parámetros a Handlebars
-    res.render('home', null); //Renderizo página "home" sin pasar ningún objeto a Handlebars
+    let chats = await MySQL.realizarQuery("SELECT * FROM Chats")
+    res.render('home', {chats:chats}); //Renderizo página "login" sin pasar ningún objeto a Handlebars
 });
 
 app.get('/registro', function(req, res)
@@ -130,6 +129,11 @@ app.post('/enviarRegistro', async function(req, res){
     console.log("Soy un pedido DELETE", req.body); //En req.body vamos a obtener el objeto con los parámetros enviados desde el frontend por método DELETE
     res.send(null);
 });*/
+app.post('/enviarMensaje', async function(req, res){
+    console.log("Soy un pedido POST/enviarMensaje", req.body);
+    
+
+});
 
 
 
@@ -137,11 +141,21 @@ io.on("connection", (socket) => {
     //Esta línea es para compatibilizar con lo que venimos escribiendo
     const req = socket.request;
 
+    socket.join("some room");
+
     //Esto serìa el equivalente a un app.post, app.get...
     socket.on('incoming-message', data => {
         console.log("INCOMING MESSAGE:", data);
         io.emit("server-message", {mensaje:"MENSAJE DE SERVIDOR", user: req.session.usuario})
     });
+
+    //Esto serìa el equivalente a un app.post, app.get...
+    socket.on('incoming-message', data => {
+        console.log("INCOMING MESSAGE:", data);
+        io.to("").emit("server-message", {mensaje:"MENSAJE DE SERVIDOR", user: req.session.usuario})
+    });
+
+    
 });
 
-setInterval(() => io.emit("server-message", { mensaje: "MENSAJE DEL SERVIDOR"}), 2000);
+setInterval(() => io.emit("server-message", {mensaje:"MENSAJE DE SERVIDOR"}), 2000);

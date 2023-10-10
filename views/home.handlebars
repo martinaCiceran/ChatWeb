@@ -13,13 +13,18 @@
                 <input type="text" placeholder="Buscar contactos...">
             </div>
             <div class="contact-list">
-                <div class="contact">
-                    <img src="img/lali.jpg" alt="Avatar">
-                </div>
                 <div class="contact-info">
                     <h3>Lali</h3>
                     <p>Holaaaa...</p>
                 </div>
+                <div class="contact-list">
+                    <ul>
+                        {{#each chats}}
+                            <li value={{this.idChat}}>{{this.nombre}}</li>
+                        {{/each}}
+                    </ul>
+                </div>
+                
             </div>
         </div>
         <div class="chat-container">
@@ -31,11 +36,6 @@
                 <div class="message sent">
                     <p>¡Hola! Estoy bien, gracias.</p>
                 </div>
-                {{#each mensajes}}
-                    <div class="message sent">
-                        <p>{{this.mensaje}}</p>
-                    </div>
-                {{/each}}
             </div>
             <form action="/enviar" method="POST">
                 <div class="input-container">
