@@ -157,10 +157,11 @@ io.on("connection", (socket) => {
         io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a..."}) //remplezar por dom, imnput del ftron
     });
 
+    //sala que queres "nuevomensaje"
     socket.on('nuevoMensaje', data =>{
-       console.log("Mensaje del input: ", data.mensaje) 
-       io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a ${data.salaNombre}"}) //remplezar por dom, imnput del ftron
+       console.log("Mensaje del input: ", data.mensaje,"sala:",req.session.salaNombre) 
+       io.to(data.salaNombre).emit("server-message", {mensaje: data.mensaje}) //remplezar por dom, imnput del ftron
     });    
 });
 
-setInterval(() => io.emit("server-message", {mensaje:"MENSAJE DEL SERVIDOR"}), 2000);
+//setInterval(() => io.emit("server-message", {mensaje:"MENSAJE DEL SERVIDOR"}), 2000);
