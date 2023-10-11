@@ -13,16 +13,15 @@
                 <input type="text" placeholder="Buscar contactos...">
             </div>
             <div class="contact-list">
-                <div class="contact-info">
-                    <h3>Lali</h3>
-                    <p>Holaaaa...</p>
-                </div>
                 <div class="contact-list">
-                    <ul>
-                        {{#each chats}}
-                            <li value={{this.idChat}}>{{this.nombre}}</li>
-                        {{/each}}
-                    </ul>
+                
+                    {{#each chats}}
+                        <div class="contact-info">
+                        <button id={{this.idChat}} onclick="uniseSala(this)" >{{this.nombre}}</button> 
+
+                        </div>
+                    {{/each}}
+                
                 </div>
                 
             </div>

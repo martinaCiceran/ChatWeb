@@ -35,7 +35,7 @@ const server=app.listen(Listen_Port, function() {
 
 const io= require('socket.io')(server);
 
-/*const sessionMiddleware=session({
+const sessionMiddleware=session({
     secret: 'sararasthastka',
     resave: true,
     saveUnintialized: false,
@@ -45,9 +45,7 @@ app.use(sessionMiddleware);
 
 io.use(function(socket, next) {
     sessionMiddleware(socket.request, socket.request.res, next);
-});*/
-
-app.use(session({secret: '123456', resave: true, saveUninitialized: true}));
+});
 
 /*
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
@@ -131,8 +129,10 @@ app.post('/enviarRegistro', async function(req, res){
 });*/
 app.post('/enviarMensaje', async function(req, res){
     console.log("Soy un pedido POST/enviarMensaje", req.body);
-    
+});
 
+app.post('/elegirContacto', async function(req, res){
+    console.log("Soy un pedido POST/elegirContacto", req.body);
 });
 
 
@@ -141,20 +141,23 @@ io.on("connection", (socket) => {
     //Esta línea es para compatibilizar con lo que venimos escribiendo
     const req = socket.request;
 
-    socket.join("some room");
-
     //Esto serìa el equivalente a un app.post, app.get...
     socket.on('incoming-message', data => {
         console.log("INCOMING MESSAGE:", data);
-        io.emit("server-message", {mensaje:"MENSAJE DE SERVIDOR", user: req.session.usuario})
+        console.log("SALA: ", req.session.salaNombre)
+        io.to(req.session.salaNombre).emit("server-message", {mensaje:"MENSAJE DE SERVIDOR"}) //remplezar por dom, imnput del ftron
     });
 
     //Esto serìa el equivalente a un app.post, app.get...
-    socket.on('incoming-message', data => {
-        console.log("INCOMING MESSAGE:", data);
-        io.to("").emit("server-message", {mensaje:"MENSAJE DE SERVIDOR", user: req.session.usuario})
+    socket.on('nombreSala', data => {
+        console.log("INCOMING Se conectò a una sala:", data.salaNombre);
+        req.session.salaNombre = data.salaNombre
+        io.to(data.salaNombre).emit("server-message", {mensaje:"Holii"})
     });
 
+    socket.on('nuevoMensaje'){
+        
+    }
     
 });
 

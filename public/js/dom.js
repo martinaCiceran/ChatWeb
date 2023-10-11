@@ -47,3 +47,8 @@ function enviarMensaje() {
   enviarMensajeGeneral(document.getElementById("message-input").value)
 }
 
+function uniseSala(button){
+  console.log("ID del boton: ", button.id)
+  socket.emit("nombreSala", {salaNombre: button.id})
+}
+
