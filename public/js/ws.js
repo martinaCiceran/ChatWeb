@@ -15,5 +15,5 @@ function funcionPrueba(){
 }
 
 function enviarMensajeGeneral(mensaje) {
-    socket.emit("incoming-message", {mensaje:mensaje, user:user})
+    socket.emit('nuevoMensaje', {mensaje:mensaje})
 }

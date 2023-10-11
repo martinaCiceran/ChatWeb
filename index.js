@@ -142,23 +142,25 @@ io.on("connection", (socket) => {
     const req = socket.request;
 
     //Esto serìa el equivalente a un app.post, app.get...
+    // SE CONECTA A LA SALA
     socket.on('incoming-message', data => {
         console.log("INCOMING MESSAGE:", data);
         console.log("SALA: ", req.session.salaNombre)
-        io.to(req.session.salaNombre).emit("server-message", {mensaje:"MENSAJE DE SERVIDOR"}) //remplezar por dom, imnput del ftron
+        io.to(req.session.salaNombre).emit("server-message", {mensaje:"MENSAJE DE SERVIDOR"}) 
     });
 
-    //Esto serìa el equivalente a un app.post, app.get...
+    //
     socket.on('nombreSala', data => {
-        console.log("INCOMING Se conectò a una sala:", data.salaNombre);
+        console.log("Se conecto a la sala:", data.salaNombre);
+        socket.join(data.salaNombre)
         req.session.salaNombre = data.salaNombre
-        io.to(data.salaNombre).emit("server-message", {mensaje:"Holii"})
+        io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a..."}) //remplezar por dom, imnput del ftron
     });
 
-    socket.on('nuevoMensaje'){
-        
-    }
-    
+    socket.on('nuevoMensaje', data =>{
+       console.log("Mensaje del input: ", data.mensaje) 
+       io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a ${data.salaNombre}"}) //remplezar por dom, imnput del ftron
+    });    
 });
 
-setInterval(() => io.emit("server-message", {mensaje:"MENSAJE DE SERVIDOR"}), 2000);
+setInterval(() => io.emit("server-message", {mensaje:"MENSAJE DEL SERVIDOR"}), 2000);
