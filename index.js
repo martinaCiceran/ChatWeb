@@ -129,6 +129,8 @@ app.post('/enviarRegistro', async function(req, res){
 });*/
 app.post('/enviarMensaje', async function(req, res){
     console.log("Soy un pedido POST/enviarMensaje", req.body);
+    await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario}, ${Date()}, ${req.body.mensaje}) `)
+
 });
 
 app.post('/elegirContacto', async function(req, res){
@@ -143,12 +145,12 @@ io.on("connection", (socket) => {
 
     //Esto serìa el equivalente a un app.post, app.get...
     // SE CONECTA A LA SALA
-    socket.on('incoming-message', data => {
+    /* socket.on('incoming-message', data => {
         console.log("INCOMING MESSAGE:", data);
         console.log("SALA: ", req.session.salaNombre)
         io.to(req.session.salaNombre).emit("server-message", {mensaje:"MENSAJE DE SERVIDOR"}) 
     });
-
+ */
     //
     socket.on('nombreSala', data => {
         console.log("Se conecto a la sala:", data.salaNombre);
