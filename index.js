@@ -143,17 +143,7 @@ io.on("connection", (socket) => {
     //Esta línea es para compatibilizar con lo que venimos escribiendo
     const req = socket.request;
 
-    /*socket.use((__, next) => {
-        console.log(req.session);
-        
-        req.session.reload((err) => {
-          if (err) {
-            socket.disconnect();
-          } else {
-            next();
-          }
-        });
-    });    
+    
     //Esto serìa el equivalente a un app.post, app.get...
     // SE CONECTA A LA SALA
     /* socket.on('incoming-message', data => {
@@ -172,8 +162,7 @@ io.on("connection", (socket) => {
         io.to(data.salaNombre).emit("server-message", {mensaje: mensajito}) //remplezar por dom, imnput del ftron
     });
 
-    req.session.save();
-    // //sala que queres "nuevomensaje"
+    //sala que queres "nuevomensaje"
     // socket.on('nuevoMensaje', data =>{
     //    console.log("Mensaje del input: ", data.mensaje,"sala:",req.session.salaNombre) 
     //    io.to(data.salaNombre).emit("server-message", {mensaje: data.mensaje}) //remplezar por dom, imnput del ftron
