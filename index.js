@@ -100,7 +100,7 @@ app.post('/login', async function(req, res)
 app.post('/home', async function(req, res)
 {
     //Petición POST con URL = "/login"
-    console.log("Soy un pedido POST", req.body); 
+    console.log("Soy un pedido POST/home", req.body); 
     let mensajes = await MySQL.realizarQuery(`SELECT mensaje FROM Mensajes WHERE idContacto = 1`)
     let chats = await MySQL.realizarQuery("SELECT * FROM Chats")
     res.render('home', {chats:chats}); //Renderizo página "login" sin pasar ningún objeto a Handlebars
@@ -127,16 +127,19 @@ app.post('/enviarRegistro', async function(req, res){
     console.log("Soy un pedido DELETE", req.body); //En req.body vamos a obtener el objeto con los parámetros enviados desde el frontend por método DELETE
     res.send(null);
 });*/
+
+
 app.post('/enviarMensaje', async function(req, res){
+    console.log(req.session.salaNombre)
+    let date = new Date()
     console.log("Soy un pedido POST/enviarMensaje", req.body);
-    await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario}, ${Date()}, ${req.body.mensaje}) `)
+    await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario[0].idContacto}, "${date}", ${req.body.mensaje}) `)
 
 });
 
 app.post('/elegirContacto', async function(req, res){
     console.log("Soy un pedido POST/elegirContacto", req.body);
 });
-
 
 
 io.on("connection", (socket) => {
@@ -159,11 +162,18 @@ io.on("connection", (socket) => {
         io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a..."}) //remplezar por dom, imnput del ftron
     });
 
-    //sala que queres "nuevomensaje"
-    socket.on('nuevoMensaje', data =>{
-       console.log("Mensaje del input: ", data.mensaje,"sala:",req.session.salaNombre) 
-       io.to(data.salaNombre).emit("server-message", {mensaje: data.mensaje}) //remplezar por dom, imnput del ftron
-    });    
+    // //sala que queres "nuevomensaje"
+    // socket.on('nuevoMensaje', data =>{
+    //    console.log("Mensaje del input: ", data.mensaje,"sala:",req.session.salaNombre) 
+    //    io.to(data.salaNombre).emit("server-message", {mensaje: data.mensaje}) //remplezar por dom, imnput del ftron
+       
+    // });    
+
+    socket.on('nuevoMensaje', data => {
+        console.log("Mensaje del input: ", data.mensaje, "sala:", req.session.salaNombre);
+        io.to(req.session.salaNombre).emit("server-message", { mensaje: data.mensaje });
+
+    });
 });
 
 //setInterval(() => io.emit("server-message", {mensaje:"MENSAJE DEL SERVIDOR"}), 2000);
