@@ -15,6 +15,8 @@ const exphbs  = require('express-handlebars'); //Para el manejo de los HTML
 const bodyParser = require('body-parser'); //Para el manejo de los strings JSON
 const MySQL = require('./modulos/mysql'); //Añado el archivo mysql.js presente en la carpeta módulos
 
+const session = require('express-session'); //Para usar variables de sesión
+
 const app = express(); //Inicializo express para el manejo de las peticiones
 
 app.use(express.static('public')); //Expongo al lado cliente la carpeta "public"
@@ -27,8 +29,22 @@ app.set('view engine', 'handlebars'); //Inicializo Handlebars
 
 const Listen_Port = 3000; //Puerto por el que estoy ejecutando la página Web
 
-app.listen(Listen_Port, function() {
+const server=app.listen(Listen_Port, function() {
     console.log('Servidor NodeJS corriendo en http://localhost:' + Listen_Port + '/');
+});
+
+const io= require('socket.io')(server);
+
+const sessionMiddleware=session({
+    secret: 'sararasthastka',
+    resave: true,
+    saveUnintialized: false,
+});
+
+app.use(sessionMiddleware);
+
+io.use(function(socket, next) {
+    sessionMiddleware(socket.request, socket.request.res, next);
 });
 
 /*
@@ -47,20 +63,11 @@ app.get('/', function(req, res)
 {
     //Petición GET con URL = "/", lease, página principal.
     console.log(req.query); //En req.query vamos a obtener el objeto con los parámetros enviados desde el frontend por método GET
-    res.render('home', null); //Renderizo página "login" sin pasar ningún objeto a Handlebars
+    res.render('login', null); //Renderizo página "login" sin pasar ningún objeto a Handlebars
 });
 
-app.get('/login', function(req, res)
-{
-    //Petición GET con URL = "/login"
-    console.log("Soy un pedido GET", req.query); 
-    let usuarios = MySQL.realizarQuery("SELECT * FROM Users")
-    //En req.query vamos a obtener el objeto con los parámetros enviados desde el frontend por método GET
-    
-    res.render('home', {vector: usuarios}); //Renderizo página "home" sin pasar ningún objeto a Handlebars
-});
 
-app.post('/login', function(req, res)
+app.get('/irAlogin', function(req, res)
 {
     //Petición POST con URL = "/login"
     console.log("Soy un pedido POST", req.body); 
@@ -69,12 +76,17 @@ app.post('/login', function(req, res)
     res.render('home', null); //Renderizo página "home" sin pasar ningún objeto a Handlebars
 });
 
-app.put('/login', async function(req, res) {
-    //Petición PUT con URL = "/login"
-    console.log("Soy un pedido PUT", req.body); //En req.body vamos a obtener el objeto con los parámetros enviados desde el frontend por método PUT
-    //Consulto en la bdd de la existencia del usuario
-    let respuesta = await MySQL.realizarQuery(`SELECT * FROM Users WHERE User = "${req.body.user}" AND Password = "${req.body.pass}"`)
+
+
+app.post('/login', async function(req, res)
+{
+    console.log("Soy un pedido POST/login", req.body); 
+    let vectorUsuario =  await MySQL.realizarQuery("SELECT * FROM Contactos")
+    let respuesta = await MySQL.realizarQuery(`SELECT * FROM Contactos WHERE usuario = "${req.body.usuario}" AND contraseña = "${req.body.contraseña}"`)
+    let idUsuario = await MySQL.realizarQuery(`SELECT idContacto FROM Contactos WHERE usuario = "${req.body.usuario}" AND contraseña = "${req.body.contraseña}"`)
     //Chequeo el largo del vector a ver si tiene datos
+    req.session.usuario = idUsuario
+    console.log(req.session.usuario)
     if (respuesta.length > 0) {
         //Armo un objeto para responder
         res.send({validar: true})    
@@ -82,12 +94,86 @@ app.put('/login', async function(req, res) {
     else{
         res.send({validar:false})    
     }
-    
-    
 });
 
-app.delete('/login', function(req, res) {
+
+app.post('/home', async function(req, res)
+{
+    //Petición POST con URL = "/login"
+    console.log("Soy un pedido POST/home", req.body); 
+    let mensajes = await MySQL.realizarQuery(`SELECT mensaje FROM Mensajes WHERE idContacto = 1`)
+    let chats = await MySQL.realizarQuery("SELECT * FROM Chats")
+    res.render('home', {chats:chats}); //Renderizo página "login" sin pasar ningún objeto a Handlebars
+});
+
+app.get('/registro', function(req, res)
+{
+    //Petición GET con URL = "/login"
+    console.log("Soy un pedido GET/registro", req.query); 
+    //En req.query vamos a obtener el objeto con los parámetros enviados desde el frontend por método GET
+    res.render('registro', null); //Renderizo página "home" sin pasar ningún objeto a Handlebars
+});
+
+app.post('/enviarRegistro', async function(req, res){
+    console.log("Soy un pedido POST/enviarRegistro", req.body);
+    await MySQL.realizarQuery(`INSERT INTO Contactos(usuario, contraseña) VALUES("${req.body.usuario}", "${req.body.contraseña}") `)
+    console.log(await (MySQL.realizarQuery("SELECT * FROM Contactos")))
+    res.render('home',null);
+});
+
+
+/*app.delete('/login', function(req, res) {
     //Petición DELETE con URL = "/login"
     console.log("Soy un pedido DELETE", req.body); //En req.body vamos a obtener el objeto con los parámetros enviados desde el frontend por método DELETE
     res.send(null);
+});*/
+
+
+app.post('/enviarMensaje', async function(req, res){
+    console.log(req.session.salaNombre)
+    let date = new Date()
+    console.log("Soy un pedido POST/enviarMensaje", req.body);
+    await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario[0].idContacto}, "${date}", ${req.body.mensaje}) `)
+
 });
+
+app.post('/elegirContacto', async function(req, res){
+    console.log("Soy un pedido POST/elegirContacto", req.body);
+});
+
+
+io.on("connection", (socket) => {
+    //Esta línea es para compatibilizar con lo que venimos escribiendo
+    const req = socket.request;
+
+    //Esto serìa el equivalente a un app.post, app.get...
+    // SE CONECTA A LA SALA
+    /* socket.on('incoming-message', data => {
+        console.log("INCOMING MESSAGE:", data);
+        console.log("SALA: ", req.session.salaNombre)
+        io.to(req.session.salaNombre).emit("server-message", {mensaje:"MENSAJE DE SERVIDOR"}) 
+    });
+ */
+    //
+    socket.on('nombreSala', data => {
+        console.log("Se conecto a la sala:", data.salaNombre);
+        socket.join(data.salaNombre)
+        req.session.salaNombre = data.salaNombre
+        io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a..."}) //remplezar por dom, imnput del ftron
+    });
+
+    // //sala que queres "nuevomensaje"
+    // socket.on('nuevoMensaje', data =>{
+    //    console.log("Mensaje del input: ", data.mensaje,"sala:",req.session.salaNombre) 
+    //    io.to(data.salaNombre).emit("server-message", {mensaje: data.mensaje}) //remplezar por dom, imnput del ftron
+       
+    // });    
+
+    socket.on('nuevoMensaje', data => {
+        console.log("Mensaje del input: ", data.mensaje, "sala:", req.session.salaNombre);
+        io.to(req.session.salaNombre).emit("server-message", { mensaje: data.mensaje });
+
+    });
+});
+
+//setInterval(() => io.emit("server-message", {mensaje:"MENSAJE DEL SERVIDOR"}), 2000);

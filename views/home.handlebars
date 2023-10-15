@@ -13,13 +13,17 @@
                 <input type="text" placeholder="Buscar contactos...">
             </div>
             <div class="contact-list">
-                <div class="contact">
-                    <img src="img/lali.jpg" alt="Avatar">
+                <div class="contact-list">
+                
+                    {{#each chats}}
+                        <div class="contact-info">
+                        <button id={{this.idChat}} onclick="uniseSala(this)" >{{this.nombre}}</button> 
+
+                        </div>
+                    {{/each}}
+                
                 </div>
-                <div class="contact-info">
-                    <h3>Lali</h3>
-                    <p>Holaaaa...</p>
-                </div>
+                
             </div>
         </div>
         <div class="chat-container">
@@ -32,10 +36,12 @@
                     <p>¡Hola! Estoy bien, gracias.</p>
                 </div>
             </div>
-            <div class="input-container">
-                <input type="text" id="message-input" placeholder="Escribe un mensaje...">
-                <button id="send-button">Enviar</button>
-            </div>
+            <form action="/enviarMensaje" method="POST">
+                <div class="input-container">
+                    <input type="text" id="message-input" name="mensaje" placeholder="Escribe un mensaje...">
+                    <input type="submit" onclick="enviarMensaje()" class="btn btn-primary" id="send-button" value="Enviar">
+                </div>
+            </form>
         </div>
     </section>
 </body>
