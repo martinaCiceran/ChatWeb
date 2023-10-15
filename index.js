@@ -43,10 +43,7 @@ const sessionMiddleware=session({
 
 app.use(sessionMiddleware);
 
-io.use(function(socket, next) {
-    sessionMiddleware(socket.request, socket.request.res, next);
-});
-
+io.engine.use(sessionMiddleware);
 /*
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
