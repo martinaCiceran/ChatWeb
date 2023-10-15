@@ -43,10 +43,7 @@ const sessionMiddleware=session({
 
 app.use(sessionMiddleware);
 
-io.use(function(socket, next) {
-    sessionMiddleware(socket.request, socket.request.res, next);
-});
-
+io.engine.use(sessionMiddleware);
 /*
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
     A PARTIR DE ESTE PUNTO GENERAREMOS NUESTRO CÓDIGO (PARA RECIBIR PETICIONES, MANEJO DB, ETC.)
@@ -162,6 +159,7 @@ io.on("connection", (socket) => {
         io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a..."}) //remplezar por dom, imnput del ftron
     });
 
+    req.session.save();
     // //sala que queres "nuevomensaje"
     // socket.on('nuevoMensaje', data =>{
     //    console.log("Mensaje del input: ", data.mensaje,"sala:",req.session.salaNombre) 
@@ -175,5 +173,4 @@ io.on("connection", (socket) => {
 
     });
 });
-
 //setInterval(() => io.emit("server-message", {mensaje:"MENSAJE DEL SERVIDOR"}), 2000);
