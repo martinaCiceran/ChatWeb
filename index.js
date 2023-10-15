@@ -130,8 +130,8 @@ app.post('/enviarMensaje', async function(req, res){
     console.log("Soy un pedido POST/enviarMensaje", req.body);
     console.log(req.session)
     let date = new Date()
-    await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario[0].idContacto}, "${date}", ${req.body.mensaje}) `)
-
+    fechaSql = date.toISOString().slice(0, 19).replace('T', ' ');
+    await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.body.sala}, ${req.session.usuario[0].idContacto}, "${fechaSql}", "${req.body.mensaje}") `)
 });
 
 app.post('/elegirContacto', async function(req, res){
@@ -143,6 +143,17 @@ io.on("connection", (socket) => {
     //Esta línea es para compatibilizar con lo que venimos escribiendo
     const req = socket.request;
 
+    /*socket.use((__, next) => {
+        console.log(req.session);
+        
+        req.session.reload((err) => {
+          if (err) {
+            socket.disconnect();
+          } else {
+            next();
+          }
+        });
+    });    
     //Esto serìa el equivalente a un app.post, app.get...
     // SE CONECTA A LA SALA
     /* socket.on('incoming-message', data => {

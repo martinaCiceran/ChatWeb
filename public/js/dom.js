@@ -26,6 +26,23 @@ async function putJSON(data) {
   }
 }
 
+async function postMensaje(data) {
+    try {
+      const response = await fetch("/enviarMensaje", {
+      method: "POST", // or 'POST'
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    
+    //En result obtengo la respuesta
+    
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
 //Esta funcion la llama el boton Ingresar que tiene que ser type button para ejecutar el onclick
 function login() {
   //Leo los datos del input
@@ -44,11 +61,25 @@ function login() {
 
 
 function enviarMensaje() {
-  enviarMensajeGeneral(document.getElementById("message-input").value)
-}
+  let mensaje  = document.getElementById("message-input").value
+  let sala = document.getElementById("sala").innerHTML
+  let data = {mensaje: mensaje,
+    sala: sala
+  }
+  console.log("mensaje:",mensaje ,"sala: ", sala)
+  //mando el mensaje al seridor socket 
+  enviarMensajeGeneral("mensaje (sala: "+sala+"): "+mensaje)
+   //mando el mensaje en un post para que se guarde en la base de datos
+   postMensaje(data)
+  
+
+  
+  }
 
 function uniseSala(button){
+
   console.log("ID del boton: ", button.id)
+  document.getElementById("sala").innerHTML = button.id
   socket.emit("nombreSala", {salaNombre: button.id})
 }
 
