@@ -38,8 +38,8 @@ const io= require('socket.io')(server);
 const sessionMiddleware=session({
     secret: 'sararasthastka',
     resave: true,
-    saveUnintialized: false,
-});
+    saveUninitialized: false,
+    });
 
 app.use(sessionMiddleware);
 
@@ -127,9 +127,9 @@ app.post('/enviarRegistro', async function(req, res){
 
 
 app.post('/enviarMensaje', async function(req, res){
-    console.log(req.session.salaNombre)
-    let date = new Date()
     console.log("Soy un pedido POST/enviarMensaje", req.body);
+    console.log(req.session)
+    let date = new Date()
     await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario[0].idContacto}, "${date}", ${req.body.mensaje}) `)
 
 });
@@ -156,7 +156,9 @@ io.on("connection", (socket) => {
         console.log("Se conecto a la sala:", data.salaNombre);
         socket.join(data.salaNombre)
         req.session.salaNombre = data.salaNombre
-        io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a..."}) //remplezar por dom, imnput del ftron
+        const mensajito = "te conectaste a sala: " + data.salaNombre
+        console.log(req.session)
+        io.to(data.salaNombre).emit("server-message", {mensaje: mensajito}) //remplezar por dom, imnput del ftron
     });
 
     req.session.save();
@@ -169,6 +171,7 @@ io.on("connection", (socket) => {
 
     socket.on('nuevoMensaje', data => {
         console.log("Mensaje del input: ", data.mensaje, "sala:", req.session.salaNombre);
+        console.log(req.session);
         io.to(req.session.salaNombre).emit("server-message", { mensaje: data.mensaje });
 
     });
