@@ -38,7 +38,7 @@ const io= require('socket.io')(server);
 const sessionMiddleware=session({
     secret: 'sararasthastka',
     resave: true,
-    saveUnintialized: false,
+    saveUninitialized: false,
 });
 
 app.use(sessionMiddleware);
@@ -72,7 +72,6 @@ app.get('/irAlogin', function(req, res)
     //res.render('home', { mensaje: "Hola mundo!", usuario: req.body.usuario}); //Renderizo página "home" enviando un objeto de 2 parámetros a Handlebars
     res.render('home', null); //Renderizo página "home" sin pasar ningún objeto a Handlebars
 });
-
 
 
 app.post('/login', async function(req, res)
