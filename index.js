@@ -39,7 +39,7 @@ const sessionMiddleware=session({
     secret: 'sararasthastka',
     resave: true,
     saveUninitialized: false,
-    });
+});
 
 app.use(sessionMiddleware);
 
@@ -127,7 +127,7 @@ app.post('/enviarRegistro', async function(req, res){
 
 
 app.post('/enviarMensaje', async function(req, res){
-    console.log("Soy un pedido POST/enviarMensaje", req.body);
+    console.log("Soy un pedido POST /enviarMensaje", req.body);
     console.log(req.session)
     let date = new Date()
     fechaSql = date.toISOString().slice(0, 19).replace('T', ' ');
@@ -156,7 +156,19 @@ io.on("connection", (socket) => {
     socket.on('nombreSala', data => {
         console.log("Se conecto a la sala:", data.salaNombre);
         socket.join(data.salaNombre)
-        req.session.salaNombre = data.salaNombre
+        
+        req.session.reload((err) => {
+            if (err) {
+              return socket.disconnect();
+            }
+            req.session.salaNombre = data.salaNombre
+            req.session.save();
+          }); 
+
+        
+        
+        
+        
         const mensajito = "te conectaste a sala: " + data.salaNombre
         console.log(req.session)
         io.to(data.salaNombre).emit("server-message", {mensaje: mensajito}) //remplezar por dom, imnput del ftron
