@@ -129,8 +129,8 @@ app.post('/enviarRegistro', async function(req, res){
 app.post('/enviarMensaje', async function(req, res){
     console.log("Soy un pedido POST /enviarMensaje", req.body);
     console.log(req.session)
-    let date = new Date()
-    fechaSql = date.toISOString().slice(0, 19).replace('T', ' ');
+    let date = new Date() // guardo la hora/fecha
+    fechaSql = date.toISOString().slice(0, 19).replace('T', ' ');  //la convierto a formato sql
     await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.body.sala}, ${req.session.usuario[0].idContacto}, "${fechaSql}", "${req.body.mensaje}") `)
 });
 
@@ -157,12 +157,13 @@ io.on("connection", (socket) => {
         console.log("Se conecto a la sala:", data.salaNombre);
         socket.join(data.salaNombre)
         
-        req.session.reload((err) => {
+        req.session.reload((err) => {   // recarga  la sesion
             if (err) {
               return socket.disconnect();
             }
-            req.session.salaNombre = data.salaNombre
-            req.session.save();
+            req.session.salaNombre = data.salaNombre  // la usa
+            console.log(req.session)
+            req.session.save();    // la guarda
           }); 
 
         
@@ -170,7 +171,6 @@ io.on("connection", (socket) => {
         
         
         const mensajito = "te conectaste a sala: " + data.salaNombre
-        console.log(req.session)
         io.to(data.salaNombre).emit("server-message", {mensaje: mensajito}) //remplezar por dom, imnput del ftron
     });
 
