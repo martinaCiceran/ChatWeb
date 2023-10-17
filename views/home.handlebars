@@ -36,12 +36,10 @@
                     <p>¡Hola! Estoy bien, gracias.</p>
                 </div>
             </div>
-            <form action="/enviarMensaje" method="POST">
-                <div class="input-container">
-                    <input type="text" id="message-input" name="mensaje" placeholder="Escribe un mensaje...">
-                    <input type="submit" onclick="enviarMensaje()" class="btn btn-primary" id="send-button" value="Enviar">
-                </div>
-            </form>
+            <div class="input-container">
+                <input type="text" id="message-input" name="mensaje" placeholder="Escribe un mensaje...">
+                <input type="button" onclick="enviarMensaje()" class="btn btn-primary" id="send-button" value="Enviar">
+            </div>
         </div>
     </section>
 </body>

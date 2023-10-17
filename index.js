@@ -125,17 +125,11 @@ app.post('/enviarRegistro', async function(req, res){
 });*/
 
 
-app.post('/enviarMensaje', async function(req, res){
-    console.log(req.session.salaNombre)
-    let date = new Date()
-    console.log("Soy un pedido POST/enviarMensaje", req.body);
-    await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario[0].idContacto}, "${date}", ${req.body.mensaje}) `)
+// app.post('/enviarMensaje', async function(req, res){
+//     console.log(req.session.salaNombre)
+//     console.log("Soy un pedido POST/enviarMensaje", req.body);
 
-});
-
-app.post('/elegirContacto', async function(req, res){
-    console.log("Soy un pedido POST/elegirContacto", req.body);
-});
+// });
 
 
 io.on("connection", (socket) => {
@@ -156,9 +150,10 @@ io.on("connection", (socket) => {
         socket.join(data.salaNombre)
         req.session.salaNombre = data.salaNombre
         io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a..."}) //remplezar por dom, imnput del ftron
+        req.session.save();
     });
 
-    req.session.save();
+
     // //sala que queres "nuevomensaje"
     // socket.on('nuevoMensaje', data =>{
     //    console.log("Mensaje del input: ", data.mensaje,"sala:",req.session.salaNombre) 
@@ -166,10 +161,15 @@ io.on("connection", (socket) => {
        
     // });    
 
-    socket.on('nuevoMensaje', data => {
+    socket.on('nuevoMensaje', async data => {
         console.log("Mensaje del input: ", data.mensaje, "sala:", req.session.salaNombre);
         io.to(req.session.salaNombre).emit("server-message", { mensaje: data.mensaje });
+        await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario[0].idContacto}, NOW(), "${data.mensaje}") `)
+
+        io.in(req.session.salaNombre).emit("nuevo-mensaje", {data:data.mensaje, id: req.session.usuario[0].idContacto}) // aca lo que sucede es que mandamos el mensaje con el id al front :)
 
     });
+
+    
 });
 //setInterval(() => io.emit("server-message", {mensaje:"MENSAJE DEL SERVIDOR"}), 2000);

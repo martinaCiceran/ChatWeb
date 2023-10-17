@@ -52,3 +52,4 @@ function uniseSala(button){
   socket.emit("nombreSala", {salaNombre: button.id})
 }
 
+
