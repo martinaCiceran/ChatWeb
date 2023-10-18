@@ -18,16 +18,38 @@ function enviarMensajeGeneral(mensaje) {
     socket.emit('nuevoMensaje', {mensaje:mensaje})
 }
 
+function uniseSala(button){
+    console.log("ID del boton: ", button.id);
+    //document.getElementById("chat-messages").innerHTML = '';
+    socket.emit("nombreSala", {salaNombre: button.id})
+}
+
 socket.on("nuevo-mensaje", data => {
     console.log("Me llego del servidoe: ", data)
     const pantalla = document.getElementById("chat-messages");
 
     if(data.id == id_log){//esto sabe si es izq o der
         pantalla.innerHTML +=
-        '<div class="message sent"><p>${data.data}</p></div>';
+        `<div class="message sent"><p>${data.data}</p></div>`;
     } else{
         pantalla.innerHTML +=
-        '<div class="message received"><p>${data.data}</p></div>';
+        `<div class="message received"><p>${data.data}</p></div>`;
     }
     document.getElementById("message-input").value = "";
 })
+
+socket.on("mensajes", data => {
+    render(data.mensajes)
+    console.log(data.mensajes)
+})
+
+function render(mensajes){
+    var html=""
+    for(let i = 0; i<mensajes.length; i++){
+        html+= `<div class = "message received">
+                    <strong>${mensajes[i].usuario}</strong>
+                    <p>${mensajes[i].mensaje}</p>
+                </div>`
+    }
+    document.getElementById("chat-messages").innerHTML+=html
+}

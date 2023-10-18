@@ -18,7 +18,6 @@
                     {{#each chats}}
                         <div class="contact-info">
                         <button id={{this.idChat}} onclick="uniseSala(this)" >{{this.nombre}}</button> 
-
                         </div>
                     {{/each}}
                 
@@ -28,12 +27,10 @@
         </div>
         <div class="chat-container">
             
-            <div class="chat-messages">
+            <div class="chat-messages" id="chat-messages">
                 <div class="message received">
-                    <p>Hola, ¿cómo estás?</p>
                 </div>
                 <div class="message sent">
-                    <p>¡Hola! Estoy bien, gracias.</p>
                 </div>
             </div>
             <div class="input-container">
