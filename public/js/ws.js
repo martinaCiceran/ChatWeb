@@ -29,7 +29,7 @@ socket.on("nuevo-mensaje", data => {
     const pantalla = document.getElementById("chat-messages");
 
     pantalla.innerHTML +=
-    `<div class="message sent"><strong>${mensajes[i].usuario}</strong><p>${data.mensaje}</p></div>`;
+    `<div class="message sent"><strong>${data.nombreP[0].usuario}</strong><p>${data.mensaje}</p></div>`;
 
     document.getElementById("message-input").value = "";
 })

@@ -97,7 +97,7 @@ app.post('/home', async function(req, res)
 {
     //Petición POST con URL = "/login"
     console.log("Soy un pedido POST/home", req.body); 
-    let chats = await MySQL.realizarQuery("SELECT * FROM Chats")
+    let chats = await MySQL.realizarQuery(`select Chats.idChat,nombre,idContacto from Chats inner join Contactos_Chats ON Chats.idChat = Contactos_Chats.idChat where idContacto = ${req.session.usuario[0].idContacto}`)
     res.render('home', {chats:chats}); //Renderizo página "login" sin pasar ningún objeto a Handlebars
 });
 
@@ -164,9 +164,9 @@ io.on("connection", (socket) => {
         io.to(req.session.salaNombre).emit("server-message", { mensaje: data.mensaje });
         await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario[0].idContacto}, NOW(), "${data.mensaje}") `)
 
-        // let mensajes = await MySQL.realizarQuery(`SELECT mensaje, usuario, idChat FROM Mensajes INNER JOIN Contactos ON Mensajes.idContacto = Contactos.idContacto WHERE Mensajes.idChat = ${req.session.salaNombre} ORDER BY idMensaje DESC LIMIT 1;`)
+        let nombreP = await MySQL.realizarQuery(`SELECT usuario FROM Contactos WHERE idContacto = ${req.session.usuario[0].idContacto};`)
 
-        io.to(req.session.salaNombre).emit("nuevo-mensaje", {mensaje: data.mensaje}) // aca lo que sucede es que mandamos el mensaje con el id al front :)
+        io.to(req.session.salaNombre).emit("nuevo-mensaje", {mensaje: data.mensaje, nombreP:nombreP}) // aca lo que sucede es que mandamos el mensaje con el id al front :)
 
     });
 
