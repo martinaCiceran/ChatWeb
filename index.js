@@ -98,6 +98,7 @@ app.post('/home', async function(req, res)
     //Petición POST con URL = "/login"
     console.log("Soy un pedido POST/home", req.body); 
     let chats = await MySQL.realizarQuery(`select Chats.idChat,nombre,idContacto from Chats inner join Contactos_Chats ON Chats.idChat = Contactos_Chats.idChat where idContacto = ${req.session.usuario[0].idContacto}`)
+    
     res.render('home', {chats:chats}); //Renderizo página "login" sin pasar ningún objeto a Handlebars
 });
 
@@ -156,7 +157,8 @@ io.on("connection", (socket) => {
             }
         }
         console.log(mensajes)
-        io.to(data.salaNombre).emit("mensajes", {mensajes:mensajes, idChat:req.session.salaNombre})
+        io.to(data.salaNombre).emit("mensajes", {mensajes:mensajes})
+
     });
    
     socket.on('nuevoMensaje', async data => {
@@ -166,7 +168,16 @@ io.on("connection", (socket) => {
 
         let nombreP = await MySQL.realizarQuery(`SELECT usuario FROM Contactos WHERE idContacto = ${req.session.usuario[0].idContacto};`)
 
-        io.to(req.session.salaNombre).emit("nuevo-mensaje", {mensaje: data.mensaje, nombreP:nombreP}) // aca lo que sucede es que mandamos el mensaje con el id al front :)
+        let mensajes = await MySQL.realizarQuery(`SELECT mensaje, usuario, idChat, Mensajes.idContacto FROM Mensajes INNER JOIN Contactos ON Mensajes.idContacto = Contactos.idContacto WHERE Mensajes.idChat = ${req.session.salaNombre} ORDER BY idMensaje DESC LIMIT 1;`)
+
+
+        if (mensajes.idContacto == req.session.usuario[0].idContacto) {
+            mensajes.idContacto = 1
+        } else {
+            mensajes.idContacto = 0
+        }
+        
+        io.to(req.session.salaNombre).emit("nuevo-mensaje", {mensaje: data.mensaje, nombreP:nombreP, idContacto: req.session.usuario[0].idContacto}) // aca lo que sucede es que mandamos el mensaje con el id al front :)
 
     });
 

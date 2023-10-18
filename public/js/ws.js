@@ -26,11 +26,22 @@ function uniseSala(button){
 
 socket.on("nuevo-mensaje", data => {
     console.log("Me llego del servidoe: ", data)
-    const pantalla = document.getElementById("chat-messages");
 
-    pantalla.innerHTML +=
-    `<div class="message sent"><strong>${data.nombreP[0].usuario}</strong><p>${data.mensaje}</p></div>`;
-
+    var html=""
+    if(data.idContacto == 1){
+        html+= `<div class = "message received">
+                    <strong>${data.nombreP[0].usuario}</strong>
+                    <p>${data.mensaje}</p>
+                </div>`
+    }
+    else{    
+        html+= `<div class="message sent">
+                    <strong>${data.nombreP[0].usuario}</strong>
+                    <p>${data.mensaje}</p>
+                </div>`
+    }
+    document.getElementById("chat-messages").innerHTML+=html
+    
     document.getElementById("message-input").value = "";
 })
 
@@ -39,7 +50,7 @@ socket.on("mensajes", data => {
     console.log(data.mensajes)
 })
 
-function render(mensajes, idChat){
+function render(mensajes){
     var html=""
     for(let i = 0; i<mensajes.length; i++){
         if(mensajes[i].idContacto != 1){
