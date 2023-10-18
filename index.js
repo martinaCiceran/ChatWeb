@@ -146,18 +146,27 @@ io.on("connection", (socket) => {
         req.session.salaNombre = data.salaNombre
         io.to(data.salaNombre).emit("server-message", {mensaje:"te conectaste a..."}) //remplezar por dom, imnput del ftron
         req.session.save();
-        let mensajes = await MySQL.realizarQuery(`SELECT mensaje, usuario FROM Mensajes INNER JOIN Contactos ON Mensajes.idContacto = Contactos.idContacto WHERE Mensajes.idChat = ${req.session.salaNombre};`)
+
+        let mensajes = await MySQL.realizarQuery(`SELECT mensaje, usuario, idChat, Mensajes.idContacto FROM Mensajes INNER JOIN Contactos ON Mensajes.idContacto = Contactos.idContacto WHERE Mensajes.idChat = ${req.session.salaNombre};`)
+        for (let i = 0; i < mensajes.length; i++) {
+            if (mensajes[i].idContacto == req.session.usuario[0].idContacto) {
+                mensajes[i].idContacto = 1
+            } else {
+                mensajes[i].idContacto = 0
+            }
+        }
         console.log(mensajes)
-        io.to(data.salaNombre).emit("mensajes", {mensajes:mensajes})
+        io.to(data.salaNombre).emit("mensajes", {mensajes:mensajes, idChat:req.session.salaNombre})
     });
    
     socket.on('nuevoMensaje', async data => {
         console.log("Mensaje del input: ", data.mensaje, "sala:", req.session.salaNombre);
         io.to(req.session.salaNombre).emit("server-message", { mensaje: data.mensaje });
         await MySQL.realizarQuery(`INSERT INTO Mensajes(idChat, idContacto, fecha, mensaje) VALUES(${req.session.salaNombre}, ${req.session.usuario[0].idContacto}, NOW(), "${data.mensaje}") `)
-        let mensajes = await MySQL.realizarQuery(`SELECT mensaje, usuario FROM Mensajes INNER JOIN Contactos ON Mensajes.idContacto = Contactos.idContacto WHERE Mensajes.idChat = ${req.session.salaNombre} ORDER BY idMensaje DESC LIMIT 1;`)
 
-        io.to(req.session.salaNombre).emit("nuevo-mensaje", {mensajes:mensajes}) // aca lo que sucede es que mandamos el mensaje con el id al front :)
+        // let mensajes = await MySQL.realizarQuery(`SELECT mensaje, usuario, idChat FROM Mensajes INNER JOIN Contactos ON Mensajes.idContacto = Contactos.idContacto WHERE Mensajes.idChat = ${req.session.salaNombre} ORDER BY idMensaje DESC LIMIT 1;`)
+
+        io.to(req.session.salaNombre).emit("nuevo-mensaje", {mensaje: data.mensaje}) // aca lo que sucede es que mandamos el mensaje con el id al front :)
 
     });
 
