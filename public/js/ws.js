@@ -17,3 +17,54 @@ function funcionPrueba(){
 function enviarMensajeGeneral(mensaje) {
     socket.emit('nuevoMensaje', {mensaje:mensaje})
 }
+
+function uniseSala(button){
+    console.log("ID del boton: ", button.id);
+    document.getElementById("chat-messages").innerHTML = '';
+    socket.emit("nombreSala", {salaNombre: button.id})
+}
+
+socket.on("nuevo-mensaje", data => {
+    console.log("Me llego del servidoe: ", data)
+
+    var html=""
+    if(data.idContacto == 1){
+        html+= `<div class = "message received">
+                    <strong>${data.nombreP[0].usuario}</strong>
+                    <p>${data.mensaje}</p>
+                </div>`
+    }
+    else{    
+        html+= `<div class="message sent">
+                    <strong>${data.nombreP[0].usuario}</strong>
+                    <p>${data.mensaje}</p>
+                </div>`
+    }
+    document.getElementById("chat-messages").innerHTML+=html
+    
+    document.getElementById("message-input").value = "";
+})
+
+socket.on("mensajes", data => {
+    render(data.mensajes)
+    console.log(data.mensajes)
+})
+
+function render(mensajes){
+    var html=""
+    for(let i = 0; i<mensajes.length; i++){
+        if(mensajes[i].idContacto != 1){
+            html+= `<div class = "message received">
+                    <strong>${mensajes[i].usuario}</strong>
+                    <p>${mensajes[i].mensaje}</p>
+                    </div>`
+        }
+        else{    
+            html+= `<div class="message sent">
+            <strong>${mensajes[i].usuario}</strong>
+            <p>${mensajes[i].mensaje}</p>
+            </div>`
+        }
+    }
+    document.getElementById("chat-messages").innerHTML+=html
+}
