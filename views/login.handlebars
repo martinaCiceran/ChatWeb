@@ -1,24 +1,19 @@
+{{!-- usuario=abru contraseña=123 --}}
 <form action="/login" method="POST" class="container-sm" id="logReg">
     <div class="mb-3 form-group">
         <h2 id="tituloIngresar">INGRESAR</h2>
     </div><br>
     <div class="mb-3 form-group">
         <label for="usuarioId" class="form-label">USUARIO</label>
-        <input type="text" class="form-control" id="usuarioId" name="usuario" value="" placeholder="Ingrese un nombre de usuario" >
+        <input type="text" class="form-control" id="usuarioId" name="usuario" value="" placeholder="abru" >
     </div>
     <div class="mb-3 form-group">
         <label for="contraseñaId" class="form-label">CONTRASEÑA</label>
-        <input type="password" class="form-control" id="contraseñaId" placeholder="Contraseña" >
+        <input type="password" class="form-control" id="contraseñaId" placeholder="123" >
     </div>
     <div class="mb-3 form-check">
         <input type="button" onclick="login()" class="botonesEnGeneral" value="INGRESAR" >
     </div>
-</form>
-<form action="/registro" method="GET" class="container-sm" id="Regi">
-    <div class="mb-3 form-check">
-        <input type="submit" class="botonesEnGeneral" value="REGISTRARSE" >
-    </div>
-        <!--quiero regitarse -->
 </form>
 
 <form action="/home" method="POST" class="container-sm" id="formlogin">
